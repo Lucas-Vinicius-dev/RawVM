@@ -47,8 +47,19 @@ error_messages = [
     "MISSING HALT",
     "REGISTER NOT FOUND AT LINE",
     "CODE NOT FOUND AT LINE",
-    "FUNCTION NOT ENDED CORRECTLY"
+    "FUNCTION NOT ENDED CORRECTLY",
+    "OPERAND NOT FOUND AT LINE",
 ]
+
+operations = [
+    '+',
+    '-',
+    '*',
+    '/',
+    '//',
+    '%',
+]
+
 
 
 def error_handler(message, line='', line_content = ''):
@@ -60,19 +71,7 @@ output_buffer = []
 def out(text, end="\n"):
     output_buffer.append(text + end)
 
-def interpret_content(prefix, content, _type):
-    type_map = {
-        "INT": int,
-        "STR": str,
-        "FLOAT": float,
-        "BOOL": bool,
-    }
 
-    if (prefix == PREFIX):
-        if (content[1:] in memory):
-            return memory[content[1:]]
-        return None
-    return type_map[_type](content)
 
 def iterate():
     memory["PC"]+=1
@@ -81,16 +80,54 @@ def iterate():
 def get_address(token):
     return token[1:]
 
-def resolve_value(token, _type="INT"):
-    prefix = token[0]
-    return interpret_content(prefix, token, _type)
 
+def resolve_operation(operand, operator=memory["RI"]):
+    operand = int(operand)
+
+    match (operator):
+        case "+":
+            memory["ACC"] += operand
+        case "-":
+            memory["ACC"] -= operand
+        case "*":
+            memory["ACC"] *= operand
+        case "/":
+            memory["ACC"] /= operand
+        case "//":
+            memory["ACC"] //= operand
+        case "%":
+            memory["ACC"] %= operand
+        case _:
+            if (operator != 0):
+                error_handler(error_messages[4], memory["PC"], "(RAWVM DOES NOT SUPPORT LINE CONTENT FOR THIS ERROR MESSAGE)")
+            else:
+                memory["ACC"] = operand
+    
+
+
+def resolve_value(token):
+    memory["ACC"] = 0
+    tokens = token.split(' ')
+
+    for tk in tokens:
+        if (len(tk) > 0):
+            if (tk[0] == PREFIX):
+                if (tk[1:] in memory):
+                    resolve_operation(memory[tk[1:]], memory["RI"])
+            elif (tk in operations):
+                memory["RI"] = tk
+            else:
+                resolve_operation(tk, memory["RI"])
+    return memory["ACC"]
+
+
+    
 def resolve_string(token):
     tokens = token.split(' ')
     message = []
 
     for tk in tokens:
-        if (tk[0] == PREFIX): 
+        if (len(tk) > 0 and tk[0] == PREFIX):
             if (tk[1:] in memory):
                 message.append(str(memory[tk[1:]]))
                 continue
@@ -108,7 +145,7 @@ def run(code:str):
     while (True):
         line = ["_"]
         if (memory["PC"] < code_len):
-            line = code[memory["PC"]].split(' ')
+            line = code[memory["PC"]].strip().split(' ')
         else:
             error_handler(error_messages[0]) if not function_define else error_handler(error_messages[3])
             break
@@ -151,7 +188,9 @@ def run(code:str):
 
                     case "MOV":
                         address = get_address(line[1])
-                        value = resolve_value(line[2])
+                        expression = " ".join(line[2:]).strip()
+
+                        value = resolve_value(expression)
 
                         if (value == None):
                             error_handler(error_messages[1], memory["PC"], code[memory["PC"]])
@@ -161,7 +200,6 @@ def run(code:str):
                     
                     case "SHW":
                         content = line[1:] if (line[-1] not in exlcuded_label_terms) else line[1:-1]
-                        prefix = content[0]
                         value = resolve_string(" ".join(content).strip()) 
 
                         if (value == None):
