@@ -1,0 +1,6 @@
+main:
+    shw #a
+    hlt
+end
+
+jmp #main

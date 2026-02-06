@@ -1,6 +1,8 @@
-import os
+import os, sys
 
 PREFIX = '#'
+
+rom_elements = ["PC", "ZF", "SF"]
 
 memory = {
     "RI": 0,
@@ -24,7 +26,7 @@ commands = [
     # Salvam o resultado do operador lógico em um endereço
     "AND", 
     "NAND",  
-    "OR", 
+    "OR",
     "NOR", 
     "NOT",
     "XOR",
@@ -33,7 +35,9 @@ commands = [
     # Operações condicionais
     "CMP",
     "JMP",
-    "EJ",
+    "JE",
+    "JL",
+    "JG",
 ]
 
 exlcuded_label_terms = [
@@ -49,6 +53,9 @@ error_messages = [
     "CODE NOT FOUND AT LINE",
     "FUNCTION NOT ENDED CORRECTLY",
     "OPERAND NOT FOUND AT LINE",
+    "INVALID SYNTAX AT LINE",
+    "ACESSING ROM ADDRESS IS FORBIDDEN AT LINE",
+    "OPERAND SYNTAX IS INVALID AT LINE",
 ]
 
 operations = [
@@ -60,29 +67,31 @@ operations = [
     '%',
 ]
 
-
-
-def error_handler(message, line='', line_content = ''):
-    print("ERROR ||",message, line, "||" , line_content,  end='')
-    
-
 output_buffer = []
+
+def error_handler(message, line='', line_content = '', expected='', got=''):
+    line += 1 if line != '' else ''
+    if (expected != '' and got != ''):
+        print(f"ERROR || " + message + " " + str(line) + " || " + line_content + " || " + "Expected args= " + str(expected) + " || " + "Got= " + str(got))
+    else:
+        print(f"ERROR || " + message + " " + str(line) + " || " + line_content)
 
 def out(text, end="\n"):
     output_buffer.append(text + end)
 
-
-
 def iterate():
     memory["PC"]+=1
-
 
 def get_address(token):
     return token[1:]
 
-
 def resolve_operation(operand, operator=memory["RI"]):
-    operand = int(operand)
+    if (type(operand) == str):
+        if (operand.isdigit()):
+            operand = int(operand)
+        else :
+            error_handler(error_messages[7], memory["PC"], "(RAWVM STILL DOES NOT SUPPORT LINE CONTENT FOR THIS ERROR MESSAGE)")
+            sys.exit()
 
     match (operator):
         case "+":
@@ -99,13 +108,11 @@ def resolve_operation(operand, operator=memory["RI"]):
             memory["ACC"] %= operand
         case _:
             if (operator != 0):
-                error_handler(error_messages[4], memory["PC"], "(RAWVM DOES NOT SUPPORT LINE CONTENT FOR THIS ERROR MESSAGE)")
+                error_handler(error_messages[4], memory["PC"], "(RAWVM STILL DOES NOT SUPPORT LINE CONTENT FOR THIS ERROR MESSAGE)")
             else:
                 memory["ACC"] = operand
-    
 
-
-def resolve_value(token):
+def resolve_value(token, associate=True):
     memory["ACC"] = 0
     tokens = token.split(' ')
 
@@ -115,12 +122,12 @@ def resolve_value(token):
                 if (tk[1:] in memory):
                     resolve_operation(memory[tk[1:]], memory["RI"])
             elif (tk in operations):
+                if (not associate):
+                    return tk 
                 memory["RI"] = tk
             else:
                 resolve_operation(tk, memory["RI"])
     return memory["ACC"]
-
-
     
 def resolve_string(token):
     tokens = token.split(' ')
@@ -171,7 +178,7 @@ def run(code:str):
                         value = resolve_value(line[2])
 
                         if (value == None):
-                            error_handler(error_messages[1], memory["PC"], code[memory["PC"]])
+                            error_handler(error_messages[1], memory["PC"], " ".join(line))
                             break
                         else:
                             memory[address] += value
@@ -181,29 +188,34 @@ def run(code:str):
                         value = resolve_value(line[2])
 
                         if (value == None):
-                            error_handler(error_messages[1], memory["PC"], code[memory["PC"]])
+                            error_handler(error_messages[1], memory["PC"], " ".join(line))
                             break
                         else:
                             memory[address] -= value
 
                     case "MOV":
                         address = get_address(line[1])
-                        expression = " ".join(line[2:]).strip()
+                        expressions = " ".join(line[2:]).strip()
 
-                        value = resolve_value(expression)
+                        value = resolve_value(expressions)
+                        memory["RI"] = 0
 
                         if (value == None):
-                            error_handler(error_messages[1], memory["PC"], code[memory["PC"]])
+                            error_handler(error_messages[1], memory["PC"], " ".join(line))
                             break
                         else:
-                            memory[address] = value
+                            if (address in rom_elements):
+                                error_handler(error_messages[6], memory["PC"], " ".join(line))
+                                break
+                            else:
+                                memory[address] = value
                     
                     case "SHW":
                         content = line[1:] if (line[-1] not in exlcuded_label_terms) else line[1:-1]
                         value = resolve_string(" ".join(content).strip()) 
 
-                        if (value == None):
-                            error_handler(error_messages[1], memory["PC"], code[memory["PC"]])
+                        if (value == "None" or value == None):
+                            error_handler(error_messages[1], memory["PC"], " ".join(line))
                             break
                         else:
                             if (line[-1] == '>'):
@@ -223,7 +235,13 @@ def run(code:str):
                         address = get_address(line[1])
                         memory["PC"] = memory[address]
                         continue
-
+    
+                    case "CMP":
+                        val1 = resolve_value(line[1])
+                        val2 = resolve_value(line[2])
+                        memory["ZF"] = 1 if (val1 - val2 == 0) else 0
+                        memory["SF"] = 1 if (val1 < val2) else 0
+                        
                     case "JE":
                         address = get_address(line[1])
 
@@ -232,25 +250,31 @@ def run(code:str):
                             continue
 
                     case "JL":
+                        if (len(line) > 2):
+                            error_handler(error_messages[5], memory["PC"], " ".join(line), 1, len(line)-1)
+                            break
                         address = get_address(line[1])
 
                         if (memory["SF"]):
                             memory["PC"] = memory[address]
                             continue
 
-                    case "CMP":
-                        val1 = resolve_value(line[1])
-                        val2 = resolve_value(line[2])
-                        memory["ZF"] = 1 if (val1 - val2 == 0) else 0
-                        memory["SF"] = 1 if (val1 < val2) else 0
-                        
+                    case "JG":
+                        address = get_address(line[1])
+
+                        if not (memory["SF"]):
+                            memory["PC"] = memory[address]
+                            continue
+
                     case "HLT":
                         print("".join(output_buffer))
                         break
+    
                     case "END":
                         continue
+                
                     case _:
-                        error_handler(error_messages[2], memory["PC"], code[memory["PC"]])
+                        error_handler(error_messages[2], memory["PC"], " ".join(line))
                         break
 
         if (instruction == "END"):
