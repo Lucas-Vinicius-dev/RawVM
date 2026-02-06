@@ -1,0 +1,42 @@
+{
+  "$schema": "https://raw.githubusercontent.com/martinring/tmlanguage/master/tmlanguage.json",
+  "name": "RAW",
+  "patterns": [
+    {
+      "comment": "Keywords (mov, cmp, jmp, etc)",
+      "match": "(?i)\\b(add|sub|mov|shw|inc|dec|jmp|cmp|je|jl|jg|hlt)\\b",
+      "name": "keyword.control.raw"
+    },
+    {
+      "comment": "Functions",
+      "match": "\\b([a-zA-Z_]\\w*)(\\s*)(\\{)",
+      "name": "entity.name.function.raw"
+    },
+    {
+      "comment": "Registradores/Variáveis (começam com #)",
+      "match": "#[a-zA-Z0-9_]+",
+      "name": "variable.parameter.raw"
+    },
+    {
+      "comment": "Numbers",
+      "match": "\\b\\d+\\b",
+      "name": "constant.numeric.raw"
+    },
+    {
+      "comment": "Operators (+, -, *, /, //, %, |)",
+      "match": "(\\+|\\-|\\*|\\/|\\//|\\%|\\|)",
+      "name": "keyword.operator.raw"
+    },
+    {
+      "comment": "}",
+      "match": "(\\})",
+      "name": "entity.name.function.raw"
+    },
+    {
+      "comment": "Comments",
+      "match": ";.*$",
+      "name": "comment.line.raw"
+    }
+  ],
+  "scopeName": "source.raw"
+}

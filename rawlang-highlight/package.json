@@ -1,0 +1,25 @@
+{
+  "name": "raw-language",
+  "displayName": "RAW Assembly",
+  "description": "Syntax highlighting para linguagem RAW",
+  "version": "0.0.1",
+  "engines": {
+    "vscode": "^1.0.0"
+  },
+  "categories": [
+    "Programming Languages"
+  ],
+  "contributes": {
+    "languages": [{
+      "id": "raw",
+      "aliases": ["RAW", "raw"],
+      "extensions": [".raw"],
+      "configuration": "./language-configuration.json"
+    }],
+    "grammars": [{
+      "language": "raw",
+      "scopeName": "source.raw",
+      "path": "./syntaxes/raw.tmLanguage.json"
+    }]
+  }
+}
