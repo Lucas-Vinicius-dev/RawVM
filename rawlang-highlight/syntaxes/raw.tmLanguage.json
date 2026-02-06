@@ -4,7 +4,7 @@
   "patterns": [
     {
       "comment": "Keywords (mov, cmp, jmp, etc)",
-      "match": "(?i)\\b(add|sub|mov|shw|inc|dec|jmp|cmp|je|jl|jg|hlt)\\b",
+      "match": "(?i)\\b(add|sub|mov|shw|inc|dec|in|hlt|jmp|cmp|je|jl|jg|jle|jge|jne)\\b",
       "name": "keyword.control.raw"
     },
     {
