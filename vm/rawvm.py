@@ -20,8 +20,9 @@ commands = [
     "SHW", 
     "INC", 
     "DEC", 
+    "IN",
     "HLT", 
-    "END", 
+    
 
     "CMP",
     "JMP",
@@ -154,6 +155,24 @@ def run(code:str):
                         address = line[1][1:]
                         memory[address] -= 1
 
+                    case "IN":
+                        target_var = mem.get_address(line[1])
+                        message = " ".join(line[2:])
+                        
+                        if (output_buffer):
+                            print("".join(output_buffer))
+                            output_buffer.clear()
+
+                        if (len(line) < 3):
+                            utils.error_handler(error_messages[5], memory["PC"], source[memory["PC"]].strip(), "3+", len(line))
+
+                        user_input = input(f"{message} ")
+                        memory[target_var] = int(user_input) if user_input.isdigit() else user_input
+
+                    case "HLT":
+                        print("".join(output_buffer))
+                        break
+
                     case "JMP":
                         address = mem.get_address(line[1])
                         if (address in memory):
@@ -217,10 +236,6 @@ def run(code:str):
                         if not (memory["ZF"]):
                             memory["PC"] = memory[address]
                             continue
-
-                    case "HLT":
-                        print("".join(output_buffer))
-                        break
     
                     case "}":
                         continue
