@@ -1,5 +1,6 @@
 import os, sys
 
+source = ''
 PREFIX = '#'
 
 rom_elements = ["PC", "ZF", "SF"]
@@ -90,7 +91,7 @@ def resolve_operation(operand, operator=memory["RI"]):
         if (operand.isdigit()):
             operand = int(operand)
         else :
-            error_handler(error_messages[7], memory["PC"], "(RAWVM STILL DOES NOT SUPPORT LINE CONTENT FOR THIS ERROR MESSAGE)")
+            error_handler(error_messages[7], memory["PC"], source[memory["PC"]])
             sys.exit()
 
     match (operator):
@@ -144,15 +145,15 @@ def resolve_string(token):
     return " ".join(message)
 
 def run(code:str):
-    code = code.split("\n")
-    code_len = len(code)
+    source = code.split("\n")
+    code_len = len(source)
 
     function_define = False
 
     while (True):
         line = ["_"]
         if (memory["PC"] < code_len):
-            line = code[memory["PC"]].strip().split(' ')
+            line = source[memory["PC"]].strip().split(' ')
         else:
             error_handler(error_messages[0]) if not function_define else error_handler(error_messages[3])
             break
