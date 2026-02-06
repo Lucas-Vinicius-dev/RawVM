@@ -2,4 +2,4 @@ venv/
 build/
 raw.spec
 __pycache__/
-
+dist/
