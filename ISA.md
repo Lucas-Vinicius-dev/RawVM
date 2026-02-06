@@ -11,11 +11,11 @@
     * `ZF` (Zero Flag): Set when a result is zero (used for equality).
     * `SF` (Sign Flag): Set when a result is negative (used for comparison).
 
-## 📋 Instruction Set (Opcodes)
+## Instruction Set (Opcodes)
 
 The architecture consists of exactly 16 instructions, divided into **General Operations** and **Control Flow**.
 
-### 🛠️ General Instructions
+### General Instructions
 
 | Opcode | Arguments | Description | Example |
 | :--- | :--- | :--- | :--- |
@@ -47,7 +47,7 @@ Conditional jumps rely on the state of flags set by the last `CMP` instruction.
 
 *(Note: You Just need to use parenthesis when you have an expression to evaluate, otherwhise, `cmp #x #y` would work normally)*
 
-## 📐 Syntax Guide
+## Syntax Guide
 
 ### Labels and Blocks
 RAW supports defining labels using braces `{ }` to improve readability and scope visualization, although they function as standard Assembly labels.
