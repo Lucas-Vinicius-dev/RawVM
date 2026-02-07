@@ -1,4 +1,5 @@
-## RawVM
+## <img width="178" height="72" alt="image-removebg-preview" src="https://github.com/user-attachments/assets/334f89f7-eb73-4782-9911-e9e3244b795c" />
+
 RawVM is a custom-built, Turing-complete Process Virtual Machine designed to explore the fundamentals of computing architecture. It runs on a unique 16-instruction ISA (Instruction Set Architecture) that bridges the gap between the raw power of Assembly and the developer experience of modern languages.
 
 While traditional Assembly requires managing memory addresses and complex registers, RAW introduces a "High-Level Assembly" approach:
@@ -96,4 +97,5 @@ For a detailed breakdown of all 16 opcodes and how the flags work, please refer 
 MOV, ADD, SUB, INC | CMP, JMP, JE, JNE
 DEC, SHW, IN,  HLT | JG,  JGE, JL, JLE
 ```
+
 
