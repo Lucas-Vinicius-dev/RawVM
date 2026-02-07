@@ -1,7 +1,7 @@
 *(The technical manual)*
 
 ```markdown
-# RAW Instruction Set Architecture (v1.0.09999)
+# RAW Instruction Set Architecture (v1.0.0)
 
 ## Architecture & Memory
 
@@ -46,12 +46,13 @@ Conditional jumps rely on the state of flags set by the last `CMP` instruction.
 | **JLE** | `<=` | `SF=1, ZF=1`| Jump to function address if Less or Equal. | `jle #main` |
 
 *(Note: You Just need to use parenthesis when you have an expression to evaluate, otherwhise, `cmp #x #y` would work normally)*
-
+```
 ## Syntax Guide
 
 ### Labels and Blocks
+In Raw, `;` is reserved for comments, use them wisely.
+
 RAW supports defining labels using braces `{ }` to improve readability and scope visualization, although they function as standard Assembly labels.
-```
 ```
 main {
     shw Hello World
@@ -59,3 +60,4 @@ main {
 }
 
 jmp #main
+```
