@@ -57,5 +57,42 @@ Move or copy that entire folder into your VS Code extensions directory:
 
 *Obs: You can always skip the installation process by installing the executable in RELEASES area.*
 
+## Example
+```
+; FIBONACCI IN RAW VM
 
+mov #a 0
+mov #b 1
+mov #c 0
+in #iter How many numbers to generate: 
 
+main {
+    cmp #iter 0
+    je #end
+
+    shw #c | 
+    
+    ; Arithmetic operations
+    mov #c #a + #b
+    mov #a #b
+    mov #b #c
+    
+    dec #iter
+    jmp #main
+}
+
+end {
+    hlt 
+}
+
+jmp #main
+```
+
+## Architecture Overview
+For a detailed breakdown of all 16 opcodes and how the flags work, please refer to the [ISA Documentation](https://github.com/Lucas-Vinicius-dev/RawVM/tree/main/rawlang-highlight)
+
+#### Quick Opcode Overview
+```
+MOV, ADD, SUB, INC | CMP, JMP, JE, JNE
+DEC, SHW, IN,  HLT | JG,  JGE, JL, JLE
+```
