@@ -1,4 +1,3 @@
-*(The technical manual)*
 
 ```markdown
 # RAW Instruction Set Architecture (v1.0.0)
