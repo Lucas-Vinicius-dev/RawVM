@@ -62,8 +62,8 @@ Move or copy that entire folder into your VS Code extensions directory:
 ```
 ; FIBONACCI IN RAW VM
 
-mov #a 0
-mov #b 1
+mov #a 1
+mov #b 0
 mov #c 0
 in #iter How many numbers to generate: 
 
